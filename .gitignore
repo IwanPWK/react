@@ -1,1 +1,2 @@
-mern-pos/client/node_modules
+/mern-pos/client/node_modules
+/mern-pos/client-temp/
