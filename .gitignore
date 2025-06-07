@@ -1,2 +1,4 @@
 /mern-pos/client/node_modules
 /mern-pos/client-temp/
+/mern-pos/dbConnect.js
+/mern-pos/node_modules
