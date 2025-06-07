@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "antd/dist/antd.css";
 import Homepage from "./pages/Homepage";
 import Items from "./pages/Items";
 
