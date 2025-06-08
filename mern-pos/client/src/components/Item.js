@@ -16,7 +16,13 @@ function Item({ item }) {
         {item.price} $/-
       </h4>
       <div className="d-flex justify-content-end">
-        {/* <Button onClick={() => addTocart()}>Add To Cart</Button> */}
+        <Button
+        // onClick={() =>
+        //   addTocart()
+        // }
+        >
+          Add To Cart
+        </Button>
       </div>
     </div>
   );

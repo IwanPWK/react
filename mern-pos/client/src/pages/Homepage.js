@@ -22,7 +22,7 @@ function Homepage() {
       <Row>
         {itemsData.map((item) => {
           return (
-            <Col span={6}>
+            <Col span={6} xs={24} lg={6} md={12}>
               <Item item={item} />
             </Col>
           );
