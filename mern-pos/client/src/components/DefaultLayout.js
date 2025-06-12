@@ -12,12 +12,12 @@ import {
 } from "@ant-design/icons";
 import "../resourses/layout.css";
 import { Link, useNavigate } from "react-router-dom";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 const { Header, Sider, Content } = Layout;
 
 const DefaultLayout = (props) => {
   const [collapsed, setCollapsed] = useState(false);
-  // const { cartItems, loading } = useSelector((state) => state.rootReducer);
+  const { cartItems, loading } = useSelector((state) => state.rootReducer);
   const navigate = useNavigate();
   const toggle = () => {
     setCollapsed(!collapsed);
@@ -83,7 +83,10 @@ const DefaultLayout = (props) => {
             className="cart-count d-flex align-items-center"
             onClick={() => navigate("/cart")}
           >
-            <b> {/* <p className="mt-3 mr-2">{cartItems.length}</p> */}</b>
+            <b>
+              {" "}
+              <p className="mt-3 mr-2">{cartItems.length}</p>
+            </b>
             <ShoppingCartOutlined />
           </div>
         </Header>

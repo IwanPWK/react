@@ -19,7 +19,7 @@ function Homepage() {
   });
   return (
     <DefaultLayout>
-      <Row>
+     <Row gutter={20}>
         {itemsData.map((item) => {
           return (
             <Col span={6} xs={24} lg={6} md={12}>
