@@ -1,15 +1,58 @@
-//23:25
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { DateTime } from "luxon";
 
 const Home = () => {
   const [tab, setTab] = useState(1);
-  const [task, setTask] = useState(null);
+  const [task, setTask] = useState("");
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const handleTabs = (tab) => {
     setTab(tab);
   };
 
+  //convert UTC to local using luxon
+  const convertUTCToLocal = (utcDate, timeZone) => {
+    // console.log(navigator.language);
+    const locale = navigator.language || "en-US";
+    return DateTime.fromISO(utcDate, { zone: "utc" })
+      .setZone(timeZone)
+      .setLocale(locale)
+      .toLocaleString(DateTime.DATETIME_MED); // or custom formate
+  };
+
   const handleAddTask = (e) => {
     e.preventDefault();
+    setLoading(true);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    axios
+      .post("http://localhost:5000/api/new-task", { task, timezone })
+      .then((res) => {
+        setTask("");
+        setTodos([res.data, ...todos]);
+        // setTodos(res.data);
+      })
+      .catch((err) => {
+        console.error("Error adding task", err);
+        alert("Gagal menambahkan task.");
+      })
+      .finally(() => {
+        setLoading(false); // Selesai loading
+      });
+  };
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/get-tasks").then((res) => {
+      // console.log(res.data);
+      setTodos(res.data);
+    });
+  }, []);
+
+  const handleEdit = (id, task) => {
+    setIsEdit(true);
+
+    setTask(task);
   };
   return (
     <div className="bg-gray-100 w-screen h-screen">
@@ -23,13 +66,18 @@ const Home = () => {
             onChange={(e) => setTask(e.target.value)}
             type="text"
             placeholder="Enter Todo"
+            disabled={loading}
             className="bg-white w-64 p-2 outline-none border border-blue-300 rounded-md"
           />
           <button
             onClick={handleAddTask}
-            className="bg-blue-600 text-white px-4 rounded-md"
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2"
           >
-            Add
+            {loading && (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            )}
+            {loading ? "" : isEdit ? "Update" : "Add"}
           </button>
         </div>
         <div className="flex text-sm w-80 justify-evenly mt-4">
@@ -58,18 +106,38 @@ const Home = () => {
             Completed
           </p>
         </div>
-        <div className="flex justify-between bg-white p-2 w-80 mt-3 rounded-md">
-          <div>
+
+        {todos.map((todo) => (
+          <div
+            key={todo.id}
+            className="flex justify-between bg-white p-2 w-80 mt-3 rounded-md"
+          >
+            <div>
+              <p className="text-lg font-semibold">{todo.task}</p>
+              <p className="text-xs text-gray-600">
+                {convertUTCToLocal(todo.createdAt, todo.timezone)}
+              </p>
+              <p className="text-sm text-gray-700">Status : {todo.status}</p>
+            </div>
+            <div className="flex flex-col text-sm justify-center items-start">
+              <button
+                className="text-blue-600 cursor-pointer"
+                onClick={() => handleEdit(todo.id, todo.task)}
+              >
+                Edit
+              </button>
+              <button className="text-red-500 cursor-pointer">Delete</button>
+              <button className="text-green-600 cursor-pointer">
+                Complete
+              </button>
+            </div>
+          </div>
+        ))}
+        {/* <div>
             <p className="text-lg font-semibold">Buy Rice</p>
             <p className="text-xs text-gray-600">10/12/2024 10:30</p>
             <p className="text-sm text-gray-700">Status : Active</p>
-          </div>
-          <div className="flex flex-col text-sm justify-center items-start">
-            <button className="text-blue-600 cursor-pointer">Edit</button>
-            <button className="text-red-500 cursor-pointer">Delete</button>
-            <button className="text-green-600 cursor-pointer">Complete</button>
-          </div>
-        </div>
+          </div> */}
       </div>
     </div>
   );
