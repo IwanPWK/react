@@ -8,6 +8,7 @@ const Home = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [updateIdTask, setUpdateIdTask] = useState(null);
   const handleTabs = (tab) => {
     setTab(tab);
   };
@@ -31,6 +32,7 @@ const Home = () => {
       .then((res) => {
         setTask("");
         setTodos([res.data, ...todos]);
+
         // setTodos(res.data);
       })
       .catch((err) => {
@@ -49,11 +51,49 @@ const Home = () => {
     });
   }, []);
 
+  const handleUpdateTask = (e) => {
+    e.preventDefault();
+    setIsEdit(false);
+    setLoading(true);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    console.log(`UpdateIdTask = ${updateIdTask}`);
+
+    axios
+      .post("http://localhost:5000/api/update-task", {
+        id: updateIdTask, // pastikan key-nya cocok dengan yang dibaca backend
+        task,
+        timezone,
+      })
+      .then((res) => {
+        const updatedTodo = res.data; // diasumsikan backend mengembalikan todo yang sudah diupdate
+        console.log(updatedTodo);
+
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo.id === updatedTodo.id ? updatedTodo : todo
+          )
+        );
+
+        // setUpdateIdTask(null); // reset ID update jika perlu
+        console.log(todos);
+      })
+      .catch((err) => {
+        console.error("Error updating task", err);
+        alert("Gagal mengupdate task.");
+      })
+      .finally(() => {
+        setTask("");
+        setUpdateIdTask(null); // reset ID update jika perlu
+        setLoading(false); // Selesai loading
+      });
+  };
+
   const handleEdit = (id, task) => {
     setIsEdit(true);
-
     setTask(task);
+    setUpdateIdTask(id);
   };
+
   return (
     <div className="bg-gray-100 w-screen h-screen">
       <div className="flex flex-col w-screen h-screen justify-center items-center">
@@ -61,16 +101,20 @@ const Home = () => {
           <h2 className="font-bold text-2xl mb-4">Todo Lists</h2>
         </div>
         <div className="flex gap-3">
+          <span className="text-sm text-gray-500 text-right">
+            {task.length}/75
+          </span>
           <input
             value={task}
             onChange={(e) => setTask(e.target.value)}
             type="text"
             placeholder="Enter Todo"
+            maxLength={75}
             disabled={loading}
             className="bg-white w-64 p-2 outline-none border border-blue-300 rounded-md"
           />
           <button
-            onClick={handleAddTask}
+            onClick={isEdit ? handleUpdateTask : handleAddTask}
             disabled={loading}
             className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2"
           >

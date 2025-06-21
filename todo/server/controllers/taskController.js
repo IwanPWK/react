@@ -37,7 +37,34 @@ const createTask = (req, res) => {
   });
 };
 
+const updateTask = (req, res) => {
+  console.log(req.body);
+  const createdAt = new Date().toISOString();
+  const { id, task, timezone } = req.body;
+  const q =
+    "update tasks set task = ?, createdAt = ?, timezone = ?, status = ? where id = ?";
+  const values = [task, createdAt, timezone, "active", id];
+  db.query(q, values, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    console.log("Task has been added");
+    console.log(id);
+    const updatedTask = {
+      id: id, // ini dari hasil INSERT
+      task,
+      timezone,
+      createdAt,
+      status: "active",
+    };
+    return res.status(201).json(updatedTask);
+    // getTodos(req, res); // Panggil getTodos untuk ambil data terbaru
+  });
+};
+
 module.exports = {
   getTodos,
   createTask,
+  updateTask,
 };
