@@ -59,7 +59,7 @@ const Home = () => {
     console.log(`UpdateIdTask = ${updateIdTask}`);
 
     axios
-      .post("http://localhost:5000/api/update-task", {
+      .patch("http://localhost:5000/api/update-task", {
         id: updateIdTask, // pastikan key-nya cocok dengan yang dibaca backend
         task,
         timezone,
@@ -85,6 +85,23 @@ const Home = () => {
         setTask("");
         setUpdateIdTask(null); // reset ID update jika perlu
         setLoading(false); // Selesai loading
+      });
+  };
+
+  const handleDelete = (id) => {
+    console.log(id);
+    setLoading(true);
+    axios
+      .delete(`http://localhost:5000/api/delete-task/`, { data: { id } })
+      .then(() => {
+        setTodos(todos.filter((todo) => todo.id !== id));
+      })
+      .catch((err) => {
+        console.error("Error deleting task", err);
+        alert("Gagal menghapus task.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -170,7 +187,16 @@ const Home = () => {
               >
                 Edit
               </button>
-              <button className="text-red-500 cursor-pointer">Delete</button>
+              <button
+                className="text-red-500 cursor-pointer"
+                onClick={() => handleDelete(todo.id)}
+              >
+                {" "}
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                )}
+                {loading ? "" : "Delete"}
+              </button>
               <button className="text-green-600 cursor-pointer">
                 Complete
               </button>

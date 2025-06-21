@@ -39,18 +39,19 @@ const createTask = (req, res) => {
 
 const updateTask = (req, res) => {
   console.log(req.body);
+  // console.log(`params ${req.params}`);
   const createdAt = new Date().toISOString();
   const { id, task, timezone } = req.body;
   const q =
-    "update tasks set task = ?, createdAt = ?, timezone = ?, status = ? where id = ?";
-  const values = [task, createdAt, timezone, "active", id];
+    "update tasks set task = ?, createdAt = ?, timezone = ? where id = ?";
+  const values = [task, createdAt, timezone, id];
   db.query(q, values, (err, result) => {
     if (err) {
       console.log(err);
       return res.status(500).json(err);
     }
     console.log("Task has been added");
-    console.log(id);
+    // console.log(result);
     const updatedTask = {
       id: id, // ini dari hasil INSERT
       task,
@@ -63,8 +64,20 @@ const updateTask = (req, res) => {
   });
 };
 
+const deleteTask = (req, res) => {
+  const q = "DELETE FROM tasks WHERE id = ?";
+  const id = req.body.id;
+  db.query(q, [id], (err, data) => {
+    if (err) {
+      return res.status(500).json(false);
+    }
+    return res.status(200).json(true);
+  });
+};
+
 module.exports = {
   getTodos,
   createTask,
   updateTask,
+  deleteTask,
 };
