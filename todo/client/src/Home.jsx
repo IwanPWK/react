@@ -325,12 +325,14 @@ const Home = () => {
                   </p>
                 </div>
                 <div className="flex flex-col text-sm justify-center items-start">
-                  <button
-                    className="text-blue-600 cursor-pointer"
-                    onClick={() => handleEdit(todo.id, todo.task)}
-                  >
-                    Edit
-                  </button>
+                  {todo.status !== "Completed" && (
+                    <button
+                      className="text-blue-600 cursor-pointer"
+                      onClick={() => handleEdit(todo.id, todo.task)}
+                    >
+                      Edit
+                    </button>
+                  )}
                   <button
                     className="text-red-500 cursor-pointer"
                     onClick={() => handleDelete(todo.id)}
