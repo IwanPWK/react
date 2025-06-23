@@ -19,7 +19,7 @@ const createTask = (req, res) => {
   const { task, timezone } = req.body;
   // const createdAt = new Date().toISOString().slice(0, 19).replace("T", " ");
   const createdAt = new Date().toISOString();
-  db.query(q, [task, createdAt, timezone, "active"], (err, result) => {
+  db.query(q, [task, createdAt, timezone, "Active"], (err, result) => {
     if (err) {
       console.log(err);
       return res.status(500).json(err);
@@ -30,7 +30,7 @@ const createTask = (req, res) => {
       task,
       timezone,
       createdAt,
-      status: "active",
+      status: "Active",
     };
     return res.status(201).json(insertedTask);
     // getTodos(req, res); // Panggil getTodos untuk ambil data terbaru
@@ -57,10 +57,24 @@ const updateTask = (req, res) => {
       task,
       timezone,
       createdAt,
-      status: "active",
+      status: "Active",
     };
     return res.status(201).json(updatedTask);
     // getTodos(req, res); // Panggil getTodos untuk ambil data terbaru
+  });
+};
+
+const updateCompleteTask = (req, res) => {
+  console.log(`id value is ${req.body.id}`);
+  const id = req.body.id;
+  const q = "update tasks set status = ? where id = ?";
+  const values = ["Completed", id];
+  db.query(q, values, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    getTodos(req, res);
   });
 };
 
@@ -80,4 +94,5 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
+  updateCompleteTask,
 };

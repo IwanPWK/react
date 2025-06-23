@@ -98,7 +98,25 @@ const Home = () => {
       })
       .catch((err) => {
         console.error("Error deleting task", err);
-        alert("Gagal menghapus task.");
+        alert("Failed to delete task");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleComplete = (id, status) => {
+    console.log("Completed");
+    if (status === "Completed") return;
+    setLoading(true);
+    axios
+      .patch(`http://localhost:5000/api/complete-task`, { id })
+      .then((res) => {
+        setTodos(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to complete task.", err);
+        alert("Failed to complete task.");
       })
       .finally(() => {
         setLoading(false);
@@ -168,41 +186,172 @@ const Home = () => {
           </p>
         </div>
 
-        {todos.map((todo) => (
-          <div
-            key={todo.id}
-            className="flex justify-between bg-white p-2 w-80 mt-3 rounded-md"
-          >
-            <div>
-              <p className="text-lg font-semibold">{todo.task}</p>
-              <p className="text-xs text-gray-600">
-                {convertUTCToLocal(todo.createdAt, todo.timezone)}
-              </p>
-              <p className="text-sm text-gray-700">Status : {todo.status}</p>
-            </div>
-            <div className="flex flex-col text-sm justify-center items-start">
-              <button
-                className="text-blue-600 cursor-pointer"
-                onClick={() => handleEdit(todo.id, todo.task)}
-              >
-                Edit
-              </button>
-              <button
-                className="text-red-500 cursor-pointer"
-                onClick={() => handleDelete(todo.id)}
-              >
-                {" "}
-                {loading && (
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+        {tab == 1 &&
+          todos.map((todo) => (
+            <div
+              key={todo.id}
+              className={`flex justify-between ${
+                todo.status === "completed" ? "bg-green-100" : "bg-white"
+              } p-2 w-80 mt-3 rounded-md`}
+            >
+              <div>
+                <p
+                  className={`${
+                    todo.status === "completed"
+                      ? "line-through text-gray-500 font-semibold"
+                      : "text-lg font-semibold"
+                  }`}
+                >
+                  {todo.task}
+                </p>
+                {/* <p className="text-lg font-semibold">{todo.task}</p> */}
+                <p className="text-xs text-gray-600">
+                  {convertUTCToLocal(todo.createdAt, todo.timezone)}
+                </p>
+                <p className="text-sm text-gray-700">Status : {todo.status}</p>
+              </div>
+              <div className="flex flex-col text-sm justify-center items-start">
+                {todo.status !== "Completed" && (
+                  <button
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => handleEdit(todo.id, todo.task)}
+                  >
+                    Edit
+                  </button>
                 )}
-                {loading ? "" : "Delete"}
-              </button>
-              <button className="text-green-600 cursor-pointer">
-                Complete
-              </button>
+                <button
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => handleDelete(todo.id)}
+                >
+                  {loading && (
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  )}
+                  {loading ? "" : "Delete"}
+                </button>
+                <button
+                  className="text-green-600 cursor-pointer"
+                  onClick={() => handleComplete(todo.id, todo.status)}
+                >
+                  {loading && (
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  )}
+                  {loading ? "" : "Complete"}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        {tab == 2 &&
+          todos
+            .filter((todo) => todo.status === "Active")
+            .map((todo) => (
+              <div
+                key={todo.id}
+                className={`flex justify-between ${
+                  todo.status === "completed" ? "bg-green-100" : "bg-white"
+                } p-2 w-80 mt-3 rounded-md`}
+              >
+                <div>
+                  <p
+                    className={`${
+                      todo.status === "completed"
+                        ? "line-through text-gray-500 font-semibold"
+                        : "text-lg font-semibold"
+                    }`}
+                  >
+                    {todo.task}
+                  </p>
+                  {/* <p className="text-lg font-semibold">{todo.task}</p> */}
+                  <p className="text-xs text-gray-600">
+                    {convertUTCToLocal(todo.createdAt, todo.timezone)}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Status : {todo.status}
+                  </p>
+                </div>
+                <div className="flex flex-col text-sm justify-center items-start">
+                  <button
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => handleEdit(todo.id, todo.task)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => handleDelete(todo.id)}
+                  >
+                    {loading && (
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    {loading ? "" : "Delete"}
+                  </button>
+                  <button
+                    className="text-green-600 cursor-pointer"
+                    onClick={() => handleComplete(todo.id, todo.status)}
+                  >
+                    {loading && (
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    {loading ? "" : "Complete"}
+                  </button>
+                </div>
+              </div>
+            ))}
+        {tab == 3 &&
+          todos
+            .filter((todo) => todo.status === "Completed")
+            .map((todo) => (
+              <div
+                key={todo.id}
+                className={`flex justify-between ${
+                  todo.status === "completed" ? "bg-green-100" : "bg-white"
+                } p-2 w-80 mt-3 rounded-md`}
+              >
+                <div>
+                  <p
+                    className={`${
+                      todo.status === "completed"
+                        ? "line-through text-gray-500 font-semibold"
+                        : "text-lg font-semibold"
+                    }`}
+                  >
+                    {todo.task}
+                  </p>
+                  {/* <p className="text-lg font-semibold">{todo.task}</p> */}
+                  <p className="text-xs text-gray-600">
+                    {convertUTCToLocal(todo.createdAt, todo.timezone)}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Status : {todo.status}
+                  </p>
+                </div>
+                <div className="flex flex-col text-sm justify-center items-start">
+                  <button
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => handleEdit(todo.id, todo.task)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => handleDelete(todo.id)}
+                  >
+                    {loading && (
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    {loading ? "" : "Delete"}
+                  </button>
+                  <button
+                    className="text-green-600 cursor-pointer"
+                    onClick={() => handleComplete(todo.id, todo.status)}
+                  >
+                    {loading && (
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    {loading ? "" : "Complete"}
+                  </button>
+                </div>
+              </div>
+            ))}
         {/* <div>
             <p className="text-lg font-semibold">Buy Rice</p>
             <p className="text-xs text-gray-600">10/12/2024 10:30</p>
